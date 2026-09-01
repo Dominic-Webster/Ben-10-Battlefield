@@ -1,0 +1,24 @@
+[gd_scene format=3 uid="uid://cnq22o0agg61y"]
+
+[ext_resource type="Script" uid="uid://sx8bp14rf5vn" path="res://scenes/board/cell.gd" id="1_ndnfp"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ndnfp"]
+albedo_color = Color(0.23633423, 0.23633423, 0.2363342, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_tfcir"]
+size = Vector3(0.95, 0.1, 0.95)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_ndnfp"]
+size = Vector3(0.95, 0.1, 0.95)
+
+[node name="Cell" type="Node3D" unique_id=1864107095]
+script = ExtResource("1_ndnfp")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=420253069]
+material_override = SubResource("StandardMaterial3D_ndnfp")
+mesh = SubResource("BoxMesh_tfcir")
+
+[node name="StaticBody3D" type="StaticBody3D" parent="." unique_id=1149931587]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="StaticBody3D" unique_id=1887187914]
+shape = SubResource("BoxShape3D_ndnfp")
