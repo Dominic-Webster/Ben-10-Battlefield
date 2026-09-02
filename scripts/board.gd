@@ -11,6 +11,7 @@ const CELL_SCENE = preload("res://scenes/board/cell.tscn")
 
 var selected_cell: BoardCell = null
 var cells: Dictionary = {}
+var base_cells : Dictionary = {}
 var highlighted_cells: Array[BoardCell] = []
 
 func _ready() -> void:
@@ -37,12 +38,17 @@ func generate_board() -> void:
 			add_child(cell)
 
 
+func register_base(base: Base, cells_to_block: Array[Vector2i]) -> void:
+	for grid_position in cells_to_block:
+		base_cells[grid_position] = base
+
+
 func _on_cell_clicked(cell: BoardCell) -> void:
 	if selected_cell != null:
 		selected_cell.unhighlight()
 	
 	selected_cell = cell
-	selected_cell.highlight()
+	selected_cell.highlight_movement()
 	
 	cell_clicked.emit(cell)
 	
@@ -51,6 +57,18 @@ func _on_cell_clicked(cell: BoardCell) -> void:
 
 func get_cell(grid_position: Vector2i) -> BoardCell:
 	return cells.get(grid_position)
+
+
+func is_base_cell(grid_position: Vector2i) -> bool:
+	return base_cells.has(grid_position)
+
+
+func get_base_cells(base: Base) -> Array[Vector2i]:
+	var result: Array[Vector2i] = []
+	for _position in base_cells.keys():
+		if base_cells[_position] == base:
+			result.append(_position)
+	return result
 
 
 func grid_to_world(grid_position: Vector2i) -> Vector3:
@@ -76,7 +94,7 @@ func get_cells_in_range(origin: Vector2i, _range: int) -> Array[BoardCell]:
 	return cells_in_range
 
 
-func show_movement_range(character: TestCharacter) -> void:
+func show_movement_range(character: TestCharacter, occupied_positions: Array[Vector2i] = [], enemy_positions: Array[Vector2i] = []) -> void:
 	clear_highlights()
 	
 	var movement_cells: Array[BoardCell] = get_cells_in_range(
@@ -85,9 +103,61 @@ func show_movement_range(character: TestCharacter) -> void:
 	)
 	
 	for cell in movement_cells:
-		if cell.grid_position != character.grid_position:
-			cell.highlight()
-			highlighted_cells.append(cell)
+		if cell.grid_position == character.grid_position:
+			continue
+		
+		if cell.grid_position in base_cells:
+			continue
+		
+		if cell.grid_position in enemy_positions:
+			cell.highlight_enemy()
+		elif cell.grid_position not in occupied_positions:
+			cell.highlight_movement()
+		
+		highlighted_cells.append(cell)
+
+
+func show_attack_range(character: TestCharacter, enemy_positions: Array[Vector2i] = []) -> void:
+	clear_highlights()
+	
+	var attack_cells: Array[BoardCell] = get_cells_in_range(
+		character.grid_position,
+		character.attack_range
+	)
+	
+	for cell in attack_cells:
+		if cell.grid_position == character.grid_position:
+			continue
+		
+		if cell.grid_position in enemy_positions:
+			cell.highlight_enemy()
+		else:
+			cell.highlight_attack()
+		
+		highlighted_cells.append(cell)
+
+
+func show_ability_range(character: TestCharacter, enemy_positions: Array[Vector2i] = []) -> void:
+	if character.ability == null:
+		return
+	
+	clear_highlights()
+	
+	var attack_cells: Array[BoardCell] = get_cells_in_range(
+		character.grid_position,
+		character.ability.ability_range
+	)
+	
+	for cell in attack_cells:
+		if cell.grid_position == character.grid_position:
+			continue
+		
+		if cell.grid_position in enemy_positions:
+			cell.highlight_enemy()
+		else:
+			cell.highlight_ability()
+		
+		highlighted_cells.append(cell)
 
 
 func clear_highlights() -> void:

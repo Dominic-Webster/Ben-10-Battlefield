@@ -2,11 +2,15 @@
 
 [ext_resource type="Script" uid="uid://ccoc7r3chirtu" path="res://scripts/game.gd" id="1_lbhrr"]
 [ext_resource type="Script" uid="uid://duhlxm28hl3nj" path="res://scripts/board.gd" id="2_iywne"]
-[ext_resource type="Script" uid="uid://c2egw8bmyuycq" path="res://scripts/Player.gd" id="3_p57ef"]
-[ext_resource type="PackedScene" uid="uid://cbjxya8ndn1w5" path="res://scenes/characters/test_character.tscn" id="4_u5sy4"]
+[ext_resource type="Script" uid="uid://c2egw8bmyuycq" path="res://player/Player.gd" id="3_p57ef"]
+[ext_resource type="PackedScene" uid="uid://cbjxya8ndn1w5" path="res://characters/test_character.tscn" id="4_u5sy4"]
+[ext_resource type="PackedScene" uid="uid://d0glkf8bmogsd" path="res://ui/main_ui.tscn" id="5_main_ui"]
+[ext_resource type="Resource" uid="uid://cjtn477541ufa" path="res://resources/abilities/power_strike.tres" id="5_u5sy4"]
+[ext_resource type="Resource" uid="uid://d3rgk0uiww05q" path="res://resources/abilities/teleport.tres" id="6_gee14"]
+[ext_resource type="PackedScene" uid="uid://bu8rshn3umcif" path="res://scenes/entities/base.tscn" id="6_p57ef"]
 
 [sub_resource type="BoxMesh" id="BoxMesh_80nbo"]
-size = Vector3(9, 0.1, 9)
+size = Vector3(10, 0.1, 9)
 
 [node name="Game" type="Node3D" unique_id=1269330327]
 script = ExtResource("1_lbhrr")
@@ -32,6 +36,11 @@ script = ExtResource("3_p57ef")
 [node name="Characters" type="Node" parent="PlayerOne" unique_id=833459880]
 
 [node name="TestCharacter" parent="PlayerOne/Characters" unique_id=1275358064 instance=ExtResource("4_u5sy4")]
+ability = ExtResource("5_u5sy4")
+grid_position = Vector2i(1, 1)
+
+[node name="TestCharacter2" parent="PlayerOne/Characters" unique_id=1017266429 instance=ExtResource("4_u5sy4")]
+ability = ExtResource("6_gee14")
 grid_position = Vector2i(1, 1)
 
 [node name="PlayerTwo" type="Node" parent="." unique_id=189317346]
@@ -39,3 +48,22 @@ script = ExtResource("3_p57ef")
 player_type = 1
 
 [node name="Characters" type="Node" parent="PlayerTwo" unique_id=1102375893]
+
+[node name="TestCharacter" parent="PlayerTwo/Characters" unique_id=696304587 instance=ExtResource("4_u5sy4")]
+owner_player = 1
+ability = ExtResource("5_u5sy4")
+grid_position = Vector2i(6, 6)
+
+[node name="TestCharacter2" parent="PlayerTwo/Characters" unique_id=190030902 instance=ExtResource("4_u5sy4")]
+owner_player = 1
+ability = ExtResource("6_gee14")
+grid_position = Vector2i(6, 6)
+
+[node name="MainUI" parent="." unique_id=399228840 instance=ExtResource("5_main_ui")]
+
+[node name="PlayerOneBase" parent="." unique_id=1269204449 instance=ExtResource("6_p57ef")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4, 0, 0)
+
+[node name="PlayerTwoBase" parent="." unique_id=130088593 instance=ExtResource("6_p57ef")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 0, 0)
+owner_player = 1

@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="AbilityData" format=3 uid="uid://d3rgk0uiww05q"]
+
+[ext_resource type="Script" uid="uid://brd4ymuwhx2uq" path="res://scripts/abilities/ability_data.gd" id="1_m61x1"]
+
+[resource]
+script = ExtResource("1_m61x1")
+ability_name = "Teleport"
+ability_type = 1
+desc = "Teleport 3 spaces"
+energy_cost = 2
+ability_range = 3
+metadata/_custom_type_script = "uid://brd4ymuwhx2uq"

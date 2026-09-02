@@ -1,0 +1,9 @@
+[gd_resource type="Resource" script_class="CardData" format=3 uid="uid://8n61q85venm"]
+
+[ext_resource type="Script" uid="uid://brnsdouduv8m0" path="res://scripts/cards/card_data.gd" id="1_lat4s"]
+
+[resource]
+script = ExtResource("1_lat4s")
+card_name = "Dash"
+desc = "Move a character 2 spaces"
+metadata/_custom_type_script = "uid://brnsdouduv8m0"

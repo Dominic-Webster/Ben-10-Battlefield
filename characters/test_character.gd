@@ -7,8 +7,9 @@ signal clicked(character : TestCharacter)
 
 @export var max_health : int = 100
 @export var attack_damage : int = 25
-@export var movement : int = 2
+@export var movement : int = 3
 @export var attack_range : int = 1
+@export var ability : AbilityData
 
 @export var grid_position : Vector2i
 
@@ -17,10 +18,22 @@ var movement_available : bool = true
 var attack_available : bool = true
 var ability_available : bool = true
 
+var base_material: StandardMaterial3D
+var mesh_instance: MeshInstance3D
+
 
 func _ready() -> void:
 	current_health = max_health
 	input_event.connect(_on_input_event)
+	
+	mesh_instance = $MeshInstance3D
+	base_material = StandardMaterial3D.new()
+	base_material.albedo_color = Color.WHITE
+	
+	if owner_player == PlayerOption.Type.PLAYER_TWO:
+		base_material.albedo_color = Color.LIGHT_CORAL
+	
+	mesh_instance.set_surface_override_material(0, base_material)
 
 
 func set_grid_position(new_position: Vector2i, board: GameBoard) -> void:
@@ -45,3 +58,19 @@ func reset_actions() -> void:
 	movement_available = true
 	attack_available = true
 	ability_available = true
+
+
+func highlight_as_target() -> void:
+	var highlight_material = base_material.duplicate()
+	highlight_material.emission_enabled = true
+	highlight_material.emission = Color(1.0, 0.3, 0.3)
+	highlight_material.emission_energy_multiplier = 1.5
+	mesh_instance.set_surface_override_material(0, highlight_material)
+
+
+func unhighlight_target() -> void:
+	mesh_instance.set_surface_override_material(0, base_material)
+
+
+func take_damage(amount : int) -> void:
+	current_health -= amount

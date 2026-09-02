@@ -35,8 +35,20 @@ func _on_input_event(
 			clicked.emit(self)
 
 
-func highlight() -> void:
+func highlight_movement() -> void:
+	mesh.material_override.albedo_color = Color(0.3, 0.5, 0.8)
+
+
+func highlight_ability() -> void:
+	mesh.material_override.albedo_color = Color(0.302, 0.675, 0.239, 1.0)
+
+
+func highlight_attack() -> void:
 	mesh.material_override.albedo_color = Color(0.8, 0.8, 0.3)
+
+
+func highlight_enemy() -> void:
+	mesh.material_override.albedo_color = Color(0.8, 0.3, 0.3)
 
 
 func unhighlight() -> void:

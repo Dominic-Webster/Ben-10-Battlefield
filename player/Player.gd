@@ -15,6 +15,11 @@ func _ready() -> void:
 	energy = starting_energy
 
 
+func start_turn() -> void:
+	gain_energy(energy_per_turn)
+	reset_character_actions()
+
+
 func gain_energy(amount: int) -> void:
 	energy = min(energy + amount, max_energy)
 
