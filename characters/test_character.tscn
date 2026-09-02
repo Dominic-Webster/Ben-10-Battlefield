@@ -1,6 +1,7 @@
 [gd_scene format=3 uid="uid://cbjxya8ndn1w5"]
 
 [ext_resource type="Script" uid="uid://bg5l3csjaavej" path="res://characters/test_character.gd" id="1_66gkc"]
+[ext_resource type="Resource" uid="uid://cjtn477541ufa" path="res://resources/abilities/power_strike.tres" id="2_764ya"]
 
 [sub_resource type="CapsuleMesh" id="CapsuleMesh_61gq8"]
 radius = 0.3
@@ -12,6 +13,7 @@ height = 0.8
 
 [node name="TestCharacter" type="CharacterBody3D" unique_id=1275358064]
 script = ExtResource("1_66gkc")
+ability = ExtResource("2_764ya")
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=406043694]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.45, 0)

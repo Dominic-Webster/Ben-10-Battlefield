@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="CardData" format=3 uid="uid://nuf2twln56vb"]
+
+[ext_resource type="Script" uid="uid://cpc4rn261lr22" path="res://scripts/cards/card_effect.gd" id="1_w5be3"]
+[ext_resource type="Script" uid="uid://ryjkbsrk7v87" path="res://scripts/cards/effects/second_wind_effect.gd" id="2_w5be3"]
+[ext_resource type="Script" uid="uid://brnsdouduv8m0" path="res://scripts/cards/card_data.gd" id="3_58yfa"]
+
+[sub_resource type="Resource" id="Resource_5nl87"]
+script = ExtResource("2_w5be3")
+metadata/_custom_type_script = "uid://ryjkbsrk7v87"
+
+[resource]
+script = ExtResource("3_58yfa")
+card_name = "Second Wind"
+desc = "Restore an action"
+target_type = 1
+effects = Array[ExtResource("1_w5be3")]([SubResource("Resource_5nl87")])
+metadata/_custom_type_script = "uid://brnsdouduv8m0"

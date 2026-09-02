@@ -4,7 +4,9 @@ enum GameMode {
 	NORMAL_SELECTION,
 	MOVEMENT_MODE,
 	ATTACK_MODE,
-	ABILITY_MODE
+	ABILITY_MODE,
+	CARD_TARGET_MODE,
+	SECOND_WIND_MODE
 }
 
 @onready var board : GameBoard = $Board
@@ -20,10 +22,92 @@ enum GameMode {
 
 var current_player : Player
 var selected_character : TestCharacter = null
-var current_mode: GameMode = GameMode.NORMAL_SELECTION
-var highlighted_enemies: Array[TestCharacter] = []
-var highlighted_bases: Array[Base] = []
-var game_over: bool = false
+var pending_card : CardData = null
+var current_mode : GameMode = GameMode.NORMAL_SELECTION
+var highlighted_targets : Array[TestCharacter] = []
+var highlighted_bases : Array[Base] = []
+var game_over : bool = false
+
+# TEMP
+var dash_card : CardData = preload("res://resources/cards/dash.tres")
+var energy_surge_card: CardData = preload("res://resources/cards/energy_surge.tres")
+var second_wind_card : CardData = preload("res://resources/cards/second_wind.tres")
+var deploy_character_card : CardData = preload("res://resources/cards/deploy_character.tres")
+
+func _input(event: InputEvent) -> void:
+	if event is InputEventKey:
+		if not event.pressed:
+			return
+		
+		if current_mode == GameMode.SECOND_WIND_MODE:
+			if selected_character == null:
+				return
+			
+			if event.keycode == KEY_M:
+				_restore_second_wind_action(
+					SecondWindEffect.ActionType.MOVEMENT
+				)
+			
+			elif event.keycode == KEY_A:
+				_restore_second_wind_action(
+					SecondWindEffect.ActionType.ATTACK
+				)
+			
+			elif event.keycode == KEY_B:
+				_restore_second_wind_action(
+					SecondWindEffect.ActionType.ABILITY
+				)
+			
+			return
+		
+		if event.keycode == KEY_D:
+			play_card(dash_card)
+		
+		if event.keycode == KEY_E:
+			play_card(energy_surge_card)
+		
+		if event.keycode == KEY_S:
+			play_card(second_wind_card)
+		
+		if event.keycode == KEY_P:
+			play_card(deploy_character_card)
+
+
+func _restore_second_wind_action(action_type : SecondWindEffect.ActionType) -> void:
+	if selected_character == null:
+		return
+	
+	match action_type:
+		SecondWindEffect.ActionType.MOVEMENT:
+			if selected_character.movement_available:
+				print("Movement is already available.")
+				return
+
+		SecondWindEffect.ActionType.ATTACK:
+			if selected_character.attack_available:
+				print("Attack is already available.")
+				return
+
+		SecondWindEffect.ActionType.ABILITY:
+			if selected_character.ability_available:
+				print("Ability is already available.")
+				return
+	
+	if not current_player.spend_energy(pending_card.energy_cost):
+		print("Not enough energy!")
+		return
+	
+	for effect in pending_card.effects:
+		if effect is SecondWindEffect:
+			effect.apply(selected_character, action_type)
+	
+	print("Restored action on ", selected_character.name)
+	
+	current_mode = GameMode.NORMAL_SELECTION
+	selected_character = null
+	pending_card = null
+	_clear_target_highlights()
+	board.clear_highlights()
 
 
 func _ready() -> void:
@@ -124,6 +208,11 @@ func _on_character_clicked(clicked_character: TestCharacter) -> void:
 	if game_over:
 		return
 	
+	# Card targeting
+	if current_mode == GameMode.CARD_TARGET_MODE:
+		_handle_card_target(clicked_character)
+		return
+	
 	# Teleport does not target characters
 	# Ignor character clicks while teleport is active
 	if current_mode == GameMode.ABILITY_MODE:
@@ -165,6 +254,166 @@ func _on_character_clicked(clicked_character: TestCharacter) -> void:
 
 
 # ======================================================
+# CARDS
+# ======================================================
+
+func play_card(card: CardData) -> void:
+	if current_player == null:
+		return
+	
+	if current_player.energy < card.energy_cost:
+		print("Not enough energy to play ", card.card_name)
+		return
+	
+	match card.target_type:
+		CardData.TargetType.NONE:
+			_play_card(card)
+		
+		CardData.TargetType.CHARACTER:
+			pending_card = card
+			current_mode = GameMode.CARD_TARGET_MODE
+			_show_card_character_targets()
+		
+		CardData.TargetType.CELL:
+			pending_card = card
+			current_mode = GameMode.CARD_TARGET_MODE
+			_show_card_cell_targets()
+
+
+func _play_card(card: CardData) -> void:
+	if not current_player.spend_energy(card.energy_cost):
+		return
+	
+	for effect in card.effects:
+		if effect is EnergyEffect:
+			effect.apply(current_player)
+	
+	print("Played ", card.card_name)
+
+
+func _show_card_character_targets() -> void:
+	board.clear_highlights()
+	_clear_target_highlights()
+	
+	if pending_card == null:
+		return
+	
+	for player in [player_one, player_two]:
+		for _character in player.characters:
+			if _character.owner_player == current_player.player_type:
+				_character.highlight_as_target()
+				highlighted_targets.append(_character)
+
+
+func _show_card_cell_targets() -> void:
+	board.clear_highlights()
+	
+	for x in range(8):
+		for y in range(8):
+			var grid_pos := Vector2i(x, y)
+			
+			if current_player.player_type == PlayerOption.Type.PLAYER_ONE:
+				if x > 1:
+					continue
+			else:
+				if x < 6:
+					continue
+			
+			if board.is_base_cell(grid_pos) or _is_cell_occupied(grid_pos):
+				continue
+			
+			var cell := board.get_cell(grid_pos)
+			
+			if cell != null:
+				cell.highlight_movement()
+				board.highlighted_cells.append(cell)
+
+
+func _handle_card_target(target: TestCharacter) -> void:
+	if pending_card == null:
+		return
+	
+	if target.owner_player != current_player.player_type:
+		return
+	
+	if pending_card.effects.any(
+		func(effect): return effect is SecondWindEffect
+	):
+		selected_character = target
+		current_mode = GameMode.SECOND_WIND_MODE
+		_clear_target_highlights()
+		print("Choose an action to restore.")
+		return
+	
+	if not current_player.spend_energy(pending_card.energy_cost):
+		print("Not enough energy!")
+		return
+	
+	for effect in pending_card.effects:
+		if effect is MovementEffect:
+			effect.apply(target)
+	
+	print(
+		"Played ",
+		pending_card.card_name,
+		" on ",
+		target.name,
+	)
+	
+	selected_character = target
+	pending_card = null
+	
+	_finish_action()
+
+
+func _handle_card_cell_target(cell : BoardCell) -> void:
+	if pending_card == null:
+		return
+	
+	var grid_pos := cell.grid_position
+	
+	# Make sure the cell is in current player's deployment zone
+	if current_player.player_type == PlayerOption.Type.PLAYER_ONE:
+		if grid_pos.x > 1:
+			return
+	else:
+		if grid_pos.x < 6:
+			return
+	
+	# Can't deploy onto a base
+	if board.is_base_cell(grid_pos):
+		return
+	
+	# Can't deploy onto a character
+	if _is_cell_occupied(grid_pos):
+		return
+	
+	if not current_player.spend_energy(pending_card.energy_cost):
+		print("Not enough energy!")
+		return
+	
+	for effect in pending_card.effects:
+		if effect is DeployCharacterEffect:
+			var character_parent := current_player.get_node("Characters")
+			
+			var new_char : TestCharacter = effect.apply(
+				current_player,
+				grid_pos,
+				board,
+				character_parent
+			)
+			
+			new_char.clicked.connect(_on_character_clicked)
+	
+	print("Played ", pending_card.card_name, " at ", grid_pos)
+	
+	pending_card = null
+	current_mode = GameMode.NORMAL_SELECTION
+	_clear_target_highlights()
+	board.clear_highlights()
+
+
+# ======================================================
 # BASE SELECTION
 # ======================================================
 
@@ -201,6 +450,13 @@ func _on_base_clicked(clicked_base : Base) -> void:
 
 func _on_cell_clicked(cell : BoardCell) -> void:
 	if game_over:
+		return
+	
+	if current_mode == GameMode.CARD_TARGET_MODE:
+		if pending_card == null:
+			return
+		
+		_handle_card_cell_target(cell)
 		return
 	
 	if selected_character == null:
@@ -648,7 +904,7 @@ func _on_attack_button_pressed() -> void:
 					_character.grid_position
 				) <= selected_character.attack_range:
 					_character.highlight_as_target()
-					highlighted_enemies.append(_character)
+					highlighted_targets.append(_character)
 	
 	# Find enemy base
 	var enemy_base := _get_enemy_base()
@@ -703,7 +959,7 @@ func _on_ability_button_pressed() -> void:
 					_character.grid_position
 				) <= selected_character.ability.ability_range:
 					_character.highlight_as_target()
-					highlighted_enemies.append(_character)
+					highlighted_targets.append(_character)
 	
 	# Find enemy base
 	var enemy_base := _get_enemy_base()
@@ -734,6 +990,15 @@ func _distance_between(a: Vector2i, b : Vector2i) -> int:
 	return abs(a.x - b.x) + abs(a.y - b.y)
 
 
+func _is_cell_occupied(grid_pos : Vector2i) -> bool:
+	for player in [player_one, player_two]:
+		for _char in player.characters:
+			if _char.grid_position == grid_pos:
+				return true
+	
+	return false
+
+
 func _get_character_at(grid_position : Vector2i) -> TestCharacter:
 	for player in [player_one, player_two]:
 		for _character in player.characters:
@@ -762,10 +1027,10 @@ func _base_in_range(target_base : Base, attack_range : int) -> bool:
 
 
 func _clear_target_highlights() -> void:
-	for enemy in highlighted_enemies:
+	for enemy in highlighted_targets:
 		enemy.unhighlight_target()
 	
-	highlighted_enemies.clear()
+	highlighted_targets.clear()
 	
 	for base in highlighted_bases:
 		base.unhighlight_target()
@@ -798,8 +1063,8 @@ func _remove_character(target : TestCharacter) -> void:
 	else:
 		player_two.characters.erase(target)
 	
-	if target in highlighted_enemies:
-		highlighted_enemies.erase(target)
+	if target in highlighted_targets:
+		highlighted_targets.erase(target)
 	
 	target.queue_free()
 

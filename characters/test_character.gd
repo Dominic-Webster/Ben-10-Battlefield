@@ -68,9 +68,30 @@ func highlight_as_target() -> void:
 	mesh_instance.set_surface_override_material(0, highlight_material)
 
 
+func update_team_visual() -> void:
+	if owner_player == PlayerOption.Type.PLAYER_TWO:
+		base_material.albedo_color = Color.LIGHT_CORAL
+	else:
+		base_material.albedo_color = Color.WHITE
+	
+	mesh_instance.set_surface_override_material(0, base_material)
+
+
 func unhighlight_target() -> void:
 	mesh_instance.set_surface_override_material(0, base_material)
 
 
 func take_damage(amount : int) -> void:
 	current_health -= amount
+
+
+func restore_movement() -> void:
+	movement_available = true
+
+
+func restore_attack() -> void:
+	attack_available = true
+
+
+func restore_ability() -> void:
+	ability_available = true

@@ -52,7 +52,7 @@ func _on_cell_clicked(cell: BoardCell) -> void:
 	
 	cell_clicked.emit(cell)
 	
-	print("Selected cell: ", selected_cell.grid_position)
+	print("Selected cell: ", cell.grid_position)
 
 
 func get_cell(grid_position: Vector2i) -> BoardCell:
@@ -165,6 +165,10 @@ func clear_highlights() -> void:
 		cell.unhighlight()
 	
 	highlighted_cells.clear()
+	
+	if selected_cell != null:
+		selected_cell.unhighlight()
+		selected_cell = null
 
 
 func move_character(character: TestCharacter, destination: Vector2i) -> void:

@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="CardData" format=3 uid="uid://8syhp5jfy56t"]
+
+[ext_resource type="Script" uid="uid://cpc4rn261lr22" path="res://scripts/cards/card_effect.gd" id="1_ehhcf"]
+[ext_resource type="Script" uid="uid://brnsdouduv8m0" path="res://scripts/cards/card_data.gd" id="2_co3ja"]
+[ext_resource type="Script" uid="uid://dcdm3qcgetyl8" path="res://scripts/cards/effects/energy_effect.gd" id="2_d2tmw"]
+
+[sub_resource type="Resource" id="Resource_f85ph"]
+script = ExtResource("2_d2tmw")
+energy_amount = 2
+metadata/_custom_type_script = "uid://dcdm3qcgetyl8"
+
+[resource]
+script = ExtResource("2_co3ja")
+card_name = "Energy Surge"
+desc = "Gain 2 Energy"
+effects = Array[ExtResource("1_ehhcf")]([SubResource("Resource_f85ph")])
+metadata/_custom_type_script = "uid://brnsdouduv8m0"
