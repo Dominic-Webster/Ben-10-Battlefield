@@ -22,3 +22,9 @@ mesh = SubResource("CapsuleMesh_61gq8")
 [node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=1164259047]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.45, 0)
 shape = SubResource("CapsuleShape3D_66gkc")
+
+[node name="HealthBar" type="Label3D" parent="." unique_id=1213567658]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.2, 0)
+billboard = 1
+text = "100/100"
+outline_size = 8

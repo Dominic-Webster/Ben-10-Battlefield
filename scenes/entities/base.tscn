@@ -22,3 +22,9 @@ mesh = SubResource("BoxMesh_5ltwq")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="StaticBody3D" unique_id=555516373]
 shape = SubResource("BoxShape3D_qp2lt")
+
+[node name="HealthBar" type="Label3D" parent="." unique_id=1524791953]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.9, 0)
+billboard = 1
+text = "500/500"
+font_size = 40

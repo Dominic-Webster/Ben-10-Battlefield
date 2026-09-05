@@ -1,7 +1,9 @@
 [gd_resource type="Resource" script_class="CardData" format=3 uid="uid://csbx1uqsmhubi"]
 
 [ext_resource type="Script" uid="uid://cpc4rn261lr22" path="res://scripts/cards/card_effect.gd" id="1_3d83f"]
+[ext_resource type="Texture2D" uid="uid://c1j5aeusio7eb" path="res://assets/Card_Art/temp_card.png" id="1_jweyg"]
 [ext_resource type="Script" uid="uid://dfkum4dhnr5kx" path="res://scripts/cards/effects/deploy_character_effect.gd" id="2_3d83f"]
+[ext_resource type="Texture2D" uid="uid://c1bh5c3ya8ovc" path="res://assets/Card_Frames/Default_Card_Frame.png" id="2_i5ahu"]
 [ext_resource type="PackedScene" uid="uid://cbjxya8ndn1w5" path="res://characters/test_character.tscn" id="2_xggf4"]
 [ext_resource type="Script" uid="uid://brnsdouduv8m0" path="res://scripts/cards/card_data.gd" id="3_03lgs"]
 
@@ -15,6 +17,9 @@ script = ExtResource("3_03lgs")
 card_name = "Deploy Character"
 desc = "Place character on battlefield"
 energy_cost = 2
+card_type = 1
 target_type = 2
+card_frame = ExtResource("2_i5ahu")
+card_artwork = ExtResource("1_jweyg")
 effects = Array[ExtResource("1_3d83f")]([SubResource("Resource_xggf4")])
 metadata/_custom_type_script = "uid://brnsdouduv8m0"

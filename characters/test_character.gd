@@ -3,6 +3,8 @@ class_name TestCharacter
 
 signal clicked(character : TestCharacter)
 
+@onready var health_bar : Label3D = $HealthBar
+
 @export var owner_player : PlayerOption.Type = PlayerOption.Type.PLAYER_ONE
 
 @export var max_health : int = 100
@@ -24,16 +26,14 @@ var mesh_instance: MeshInstance3D
 
 func _ready() -> void:
 	current_health = max_health
+	update_health_display()
 	input_event.connect(_on_input_event)
 	
 	mesh_instance = $MeshInstance3D
 	base_material = StandardMaterial3D.new()
 	base_material.albedo_color = Color.WHITE
 	
-	if owner_player == PlayerOption.Type.PLAYER_TWO:
-		base_material.albedo_color = Color.LIGHT_CORAL
-	
-	mesh_instance.set_surface_override_material(0, base_material)
+	update_team_visual()
 
 
 func set_grid_position(new_position: Vector2i, board: GameBoard) -> void:
@@ -83,6 +83,13 @@ func unhighlight_target() -> void:
 
 func take_damage(amount : int) -> void:
 	current_health -= amount
+	current_health = max(current_health, 0)
+	
+	update_health_display()
+
+
+func update_health_display() -> void:
+	health_bar.text = str(current_health) + " / " + str(max_health)
 
 
 func restore_movement() -> void:

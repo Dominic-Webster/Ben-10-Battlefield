@@ -3,6 +3,8 @@ class_name Base
 
 signal clicked(base: Base)
 
+@onready var health_bar : Label3D = $HealthBar
+
 @export var owner_player : PlayerOption.Type = PlayerOption.Type.PLAYER_ONE
 
 @export var max_health : int = 500
@@ -16,6 +18,7 @@ var highlight_material: StandardMaterial3D
 
 func _ready() -> void:
 	current_health = max_health
+	update_health_display()
 	
 	# Store reference to mesh and set up material
 	mesh_instance = $MeshInstance3D
@@ -59,3 +62,10 @@ func unhighlight_target() -> void:
 
 func take_damage(amount: int) -> void:
 	current_health -= amount
+	current_health = max(current_health, 0)
+	
+	update_health_display()
+
+
+func update_health_display() -> void:
+	health_bar.text = str(current_health) + " / " + str(max_health)

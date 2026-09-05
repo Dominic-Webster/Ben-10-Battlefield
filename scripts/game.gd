@@ -10,12 +10,10 @@ enum GameMode {
 }
 
 @onready var board : GameBoard = $Board
-@onready var player_one: Player = $PlayerOne
-@onready var player_two: Player = $PlayerTwo
-@onready var character : TestCharacter = $PlayerOne/Characters/TestCharacter
-@onready var character2 : TestCharacter = $PlayerTwo/Characters/TestCharacter
-@onready var character3 : TestCharacter = $PlayerOne/Characters/TestCharacter2
-@onready var character4 : TestCharacter = $PlayerTwo/Characters/TestCharacter2
+@onready var player_one : Player = $PlayerOne
+@onready var p1_characters : Node = $PlayerOne/Characters
+@onready var player_two : Player = $PlayerTwo
+@onready var p2_characters : Node = $PlayerTwo/Characters
 @onready var player_one_base: Base = $PlayerOneBase
 @onready var player_two_base: Base = $PlayerTwoBase
 @onready var ui: MainUI = $MainUI
@@ -28,11 +26,9 @@ var highlighted_targets : Array[TestCharacter] = []
 var highlighted_bases : Array[Base] = []
 var game_over : bool = false
 
-# TEMP
-var dash_card : CardData = preload("res://resources/cards/dash.tres")
-var energy_surge_card: CardData = preload("res://resources/cards/energy_surge.tres")
-var second_wind_card : CardData = preload("res://resources/cards/second_wind.tres")
-var deploy_character_card : CardData = preload("res://resources/cards/deploy_character.tres")
+var player_one_has_started : bool = false
+var player_two_has_started : bool = false
+
 
 func _input(event: InputEvent) -> void:
 	if event is InputEventKey:
@@ -43,34 +39,20 @@ func _input(event: InputEvent) -> void:
 			if selected_character == null:
 				return
 			
-			if event.keycode == KEY_M:
+			if event.keycode == KEY_1:
 				_restore_second_wind_action(
 					SecondWindEffect.ActionType.MOVEMENT
 				)
 			
-			elif event.keycode == KEY_A:
+			elif event.keycode == KEY_2:
 				_restore_second_wind_action(
 					SecondWindEffect.ActionType.ATTACK
 				)
 			
-			elif event.keycode == KEY_B:
+			elif event.keycode == KEY_3:
 				_restore_second_wind_action(
 					SecondWindEffect.ActionType.ABILITY
 				)
-			
-			return
-		
-		if event.keycode == KEY_D:
-			play_card(dash_card)
-		
-		if event.keycode == KEY_E:
-			play_card(energy_surge_card)
-		
-		if event.keycode == KEY_S:
-			play_card(second_wind_card)
-		
-		if event.keycode == KEY_P:
-			play_card(deploy_character_card)
 
 
 func _restore_second_wind_action(action_type : SecondWindEffect.ActionType) -> void:
@@ -105,18 +87,12 @@ func _restore_second_wind_action(action_type : SecondWindEffect.ActionType) -> v
 	
 	current_mode = GameMode.NORMAL_SELECTION
 	selected_character = null
-	pending_card = null
+	_finish_card_play(pending_card)
 	_clear_target_highlights()
 	board.clear_highlights()
 
 
 func _ready() -> void:
-	# Connect character signals
-	character.clicked.connect(_on_character_clicked)
-	character2.clicked.connect(_on_character_clicked)
-	character3.clicked.connect(_on_character_clicked)
-	character4.clicked.connect(_on_character_clicked)
-	
 	# Connect board signals
 	board.cell_clicked.connect(_on_cell_clicked)
 	
@@ -128,26 +104,28 @@ func _ready() -> void:
 	ui.move_button_pressed.connect(_on_move_button_pressed)
 	ui.attack_button_pressed.connect(_on_attack_button_pressed)
 	ui.ability_button_pressed.connect(_on_ability_button_pressed)
+	ui.card_pressed.connect(_on_card_pressed)
 	
 	# Connect base signals
 	player_one_base.clicked.connect(_on_base_clicked)
 	player_two_base.clicked.connect(_on_base_clicked)
 	
-	# TEMPORARY CHARACTER SETUP
-	character.set_grid_position(Vector2i(1, 1), board)
-	character2.set_grid_position(Vector2i(6, 6), board)
-	character3.set_grid_position(Vector2i(1, 6), board)
-	character4.set_grid_position(Vector2i(6, 1), board)
-	player_one.characters.append(character)
-	player_two.characters.append(character2)
-	player_one.characters.append(character3)
-	player_two.characters.append(character4)
+	_setup_match()
 	
 	# Register base cells
 	board.register_base(player_one_base, [Vector2i(0, 3), Vector2i(0, 4)])
 	board.register_base(player_two_base, [Vector2i(7, 3), Vector2i(7, 4)])
 	
 	TurnManager.start_turn()
+
+
+func _setup_match() -> void:
+	# Temp Setup
+	player_one.deck = TestDeck.create_deck()
+	player_two.deck = TestDeck.create_deck()
+	
+	player_one.draw_cards(5)
+	player_two.draw_cards(5)
 
 
 # ============================================
@@ -162,11 +140,10 @@ func _on_turn_started(player: PlayerOption.Type) -> void:
 		current_player = player_one
 		player_one.start_turn()
 		
-		ui.update_label(
-			player_one_base.current_health,
-			player_one_base.max_health,
-			player_one.energy
-		)
+		if player_one_has_started:
+			player_one.draw_cards(player_one.cards_per_turn)
+		else:
+			player_one_has_started = true
 		
 		print("Player 1 Turn")
 		print("Energy: ", str(player_one.energy))
@@ -175,14 +152,16 @@ func _on_turn_started(player: PlayerOption.Type) -> void:
 		current_player = player_two
 		player_two.start_turn()
 		
-		ui.update_label(
-			player_two_base.current_health,
-			player_two_base.max_health,
-			player_two.energy
-		)
+		if player_two_has_started:
+			player_two.draw_cards(player_two.cards_per_turn)
+		else:
+			player_two_has_started = true
 		
 		print("Player 2 Turn")
 		print("Energy: ", str(player_two.energy))
+	
+	_update_ui()
+	ui.highlight_current_player(player)
 
 
 func _on_end_turn_pressed() -> void:
@@ -191,10 +170,7 @@ func _on_end_turn_pressed() -> void:
 	
 	_clear_target_highlights()
 	board.clear_highlights()
-	
-	ui.hide_character_panel()
-	
-	selected_character = null
+	_clear_selection()
 	current_mode = GameMode.NORMAL_SELECTION
 	
 	TurnManager.end_turn()
@@ -210,6 +186,12 @@ func _on_character_clicked(clicked_character: TestCharacter) -> void:
 	
 	# Card targeting
 	if current_mode == GameMode.CARD_TARGET_MODE:
+		if pending_card == null:
+			return
+		
+		if pending_card.target_type != CardData.TargetType.CHARACTER:
+			return
+		
 		_handle_card_target(clicked_character)
 		return
 	
@@ -257,12 +239,19 @@ func _on_character_clicked(clicked_character: TestCharacter) -> void:
 # CARDS
 # ======================================================
 
+func _on_card_pressed(card: CardData) -> void:
+	play_card(card)
+
+
 func play_card(card: CardData) -> void:
 	if current_player == null:
 		return
 	
 	if current_player.energy < card.energy_cost:
 		print("Not enough energy to play ", card.card_name)
+		return
+	
+	if card not in current_player.hand:
 		return
 	
 	match card.target_type:
@@ -287,6 +276,10 @@ func _play_card(card: CardData) -> void:
 	for effect in card.effects:
 		if effect is EnergyEffect:
 			effect.apply(current_player)
+			
+	current_player.play_card_from_hand(card)
+	
+	_update_ui()
 	
 	print("Played ", card.card_name)
 
@@ -298,28 +291,19 @@ func _show_card_character_targets() -> void:
 	if pending_card == null:
 		return
 	
-	for player in [player_one, player_two]:
-		for _character in player.characters:
-			if _character.owner_player == current_player.player_type:
-				_character.highlight_as_target()
-				highlighted_targets.append(_character)
+	for _character in current_player.characters:
+		_character.highlight_as_target()
+		highlighted_targets.append(_character)
 
 
 func _show_card_cell_targets() -> void:
 	board.clear_highlights()
 	
-	for x in range(8):
-		for y in range(8):
+	for x in range(board.board_width):
+		for y in range(board.board_height):
 			var grid_pos := Vector2i(x, y)
 			
-			if current_player.player_type == PlayerOption.Type.PLAYER_ONE:
-				if x > 1:
-					continue
-			else:
-				if x < 6:
-					continue
-			
-			if board.is_base_cell(grid_pos) or _is_cell_occupied(grid_pos):
+			if not _is_valid_deployment_cell(grid_pos):
 				continue
 			
 			var cell := board.get_cell(grid_pos)
@@ -361,8 +345,7 @@ func _handle_card_target(target: TestCharacter) -> void:
 	)
 	
 	selected_character = target
-	pending_card = null
-	
+	_finish_card_play(pending_card)
 	_finish_action()
 
 
@@ -372,20 +355,7 @@ func _handle_card_cell_target(cell : BoardCell) -> void:
 	
 	var grid_pos := cell.grid_position
 	
-	# Make sure the cell is in current player's deployment zone
-	if current_player.player_type == PlayerOption.Type.PLAYER_ONE:
-		if grid_pos.x > 1:
-			return
-	else:
-		if grid_pos.x < 6:
-			return
-	
-	# Can't deploy onto a base
-	if board.is_base_cell(grid_pos):
-		return
-	
-	# Can't deploy onto a character
-	if _is_cell_occupied(grid_pos):
+	if not _is_valid_deployment_cell(grid_pos):
 		return
 	
 	if not current_player.spend_energy(pending_card.energy_cost):
@@ -407,7 +377,8 @@ func _handle_card_cell_target(cell : BoardCell) -> void:
 	
 	print("Played ", pending_card.card_name, " at ", grid_pos)
 	
-	pending_card = null
+	_finish_card_play(pending_card)
+	
 	current_mode = GameMode.NORMAL_SELECTION
 	_clear_target_highlights()
 	board.clear_highlights()
@@ -816,11 +787,10 @@ func _handle_teleport(cell : BoardCell) -> void:
 
 
 func _show_teleport_range() -> void:
-	var occupied_positions: Array[Vector2i] = []
-	
-	for player in [player_one, player_two]:
-		for _character in player.characters:
-			occupied_positions.append(_character.grid_position)
+	var occupied_positions : Array[Vector2i] = (
+		player_one.get_character_positions()
+		+ player_two.get_character_positions()
+	)
 	
 	var teleport_cells := board.get_cells_in_range(
 		selected_character.grid_position,
@@ -861,15 +831,14 @@ func _on_move_button_pressed() -> void:
 	
 	_clear_target_highlights()
 	
-	var occupied_positions : Array[Vector2i] = []
 	var enemy_positions : Array[Vector2i] = []
+	var occupied_positions : Array[Vector2i] = (
+		player_one.get_character_positions()
+		+ player_two.get_character_positions()
+	)
 	
-	for player in [player_one, player_two]:
-		for _character in player.characters:
-			occupied_positions.append(_character.grid_position)
-			
-			if _character.owner_player != selected_character.owner_player:
-				enemy_positions.append(_character.grid_position)
+	for enemy in _get_enemy_characters(selected_character):
+		enemy_positions.append(enemy.grid_position)
 	
 	board.show_movement_range(
 		selected_character,
@@ -894,17 +863,15 @@ func _on_attack_button_pressed() -> void:
 	
 	var enemy_positions : Array[Vector2i] = []
 	
-	for player in [player_one, player_two]:
-		for _character in player.characters:
-			if _character.owner_player != selected_character.owner_player:
-				enemy_positions.append(_character.grid_position)
-				
-				if _distance_between(
-					selected_character.grid_position,
-					_character.grid_position
-				) <= selected_character.attack_range:
-					_character.highlight_as_target()
-					highlighted_targets.append(_character)
+	for enemy in _get_enemy_characters(selected_character):
+		enemy_positions.append(enemy.grid_position)
+		
+		if _distance_between(
+			selected_character.grid_position,
+			enemy.grid_position
+		) <= selected_character.attack_range:
+			enemy.highlight_as_target()
+			highlighted_targets.append(enemy)
 	
 	# Find enemy base
 	var enemy_base := _get_enemy_base()
@@ -949,17 +916,15 @@ func _on_ability_button_pressed() -> void:
 	# Damage Ability targeting
 	var enemy_positions : Array[Vector2i] = []
 	
-	for player in [player_one, player_two]:
-		for _character in player.characters:
-			if _character.owner_player != selected_character.owner_player:
-				enemy_positions.append(_character.grid_position)
-				
-				if _distance_between(
-					selected_character.grid_position,
-					_character.grid_position
-				) <= selected_character.ability.ability_range:
-					_character.highlight_as_target()
-					highlighted_targets.append(_character)
+	for enemy in _get_enemy_characters(selected_character):
+		enemy_positions.append(enemy.grid_position)
+		
+		if _distance_between(
+			selected_character.grid_position,
+			enemy.grid_position
+		) <= selected_character.ability.ability_range:
+			enemy.highlight_as_target()
+			highlighted_targets.append(enemy)
 	
 	# Find enemy base
 	var enemy_base := _get_enemy_base()
@@ -990,22 +955,68 @@ func _distance_between(a: Vector2i, b : Vector2i) -> int:
 	return abs(a.x - b.x) + abs(a.y - b.y)
 
 
-func _is_cell_occupied(grid_pos : Vector2i) -> bool:
-	for player in [player_one, player_two]:
-		for _char in player.characters:
-			if _char.grid_position == grid_pos:
-				return true
+func _finish_card_play(card: CardData) -> void:
+	current_player.play_card_from_hand(card)
+	pending_card = null
+	_update_ui()
+
+
+func _update_ui() -> void:
+	ui.update_player_info(
+		player_one_base.current_health,
+		player_one_base.max_health,
+		player_one.energy
+	)
 	
-	return false
+	ui.update_opponent_info(
+		player_two_base.current_health,
+		player_two_base.max_health,
+		player_two.energy
+	)
+	
+	ui.refresh_hand(current_player.hand)
+	ui.refresh_piles(current_player)
+
+
+func _is_cell_occupied(grid_pos : Vector2i) -> bool:
+	return _get_character_at(grid_pos) != null
+
+
+func _is_valid_deployment_cell(grid_pos : Vector2i) -> bool:
+	if current_player.player_type == PlayerOption.Type.PLAYER_ONE:
+		if grid_pos.x > 1:
+			return false
+	else:
+		if grid_pos.x < board.board_width - 2:
+			return false
+	
+	if board.is_base_cell(grid_pos):
+		return false
+	
+	if _is_cell_occupied(grid_pos):
+		return false
+	
+	return true
 
 
 func _get_character_at(grid_position : Vector2i) -> TestCharacter:
+	var _character := player_one.get_character_at(grid_position)
+	
+	if _character != null:
+		return _character
+	
+	return player_two.get_character_at(grid_position)
+
+
+func _get_enemy_characters(_char : TestCharacter) -> Array[TestCharacter]:
+	var enemies : Array[TestCharacter] = []
+	
 	for player in [player_one, player_two]:
 		for _character in player.characters:
-			if _character.grid_position == grid_position:
-				return _character
+			if _character.owner_player != _char.owner_player:
+				enemies.append(_character)
 	
-	return null
+	return enemies
 
 
 func _get_enemy_base() -> Base:
@@ -1024,6 +1035,11 @@ func _base_in_range(target_base : Base, attack_range : int) -> bool:
 			return true
 	
 	return false
+
+
+func _clear_selection() -> void:
+	selected_character = null
+	ui.hide_character_panel()
 
 
 func _clear_target_highlights() -> void:
