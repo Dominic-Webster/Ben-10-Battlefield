@@ -65,7 +65,7 @@ func _restore_second_wind_action(action_type : SecondWindEffect.ActionType) -> v
 	
 	match action_type:
 		SecondWindEffect.ActionType.MOVEMENT:
-			if selected_character.movement_available:
+			if selected_character.movement_remaining >= selected_character.movement:
 				print("Movement is already available.")
 				return
 
@@ -311,6 +311,33 @@ func play_card(card: CardData) -> void:
 			_show_card_cell_targets()
 
 
+func play_card_on_cell(card : CardData, grid_pos : Vector2i) -> bool:
+	if current_player == null:
+		return false
+	
+	if card not in current_player.hand:
+		return false
+	
+	if card.target_type != CardData.TargetType.CELL:
+		return false
+	
+	if current_player.energy < card.energy_cost:
+		return false
+	
+	if not _is_valid_deployment_cell(grid_pos):
+		return false
+	
+	var cell := board.get_cell(grid_pos)
+	
+	if cell == null:
+		return false
+	
+	pending_card = card
+	_handle_card_cell_target(cell)
+	
+	return true
+
+
 func _play_card(card: CardData) -> void:
 	if not current_player.spend_energy(card.energy_cost):
 		return
@@ -500,7 +527,7 @@ func _handle_movement(cell : BoardCell) -> void:
 	if selected_character == null:
 		return
 	
-	if not selected_character.movement_available:
+	if not selected_character.movement_remaining > 0:
 		return
 	
 	if cell.grid_position == selected_character.grid_position:
@@ -514,7 +541,7 @@ func _handle_movement(cell : BoardCell) -> void:
 	if _distance_between(
 		selected_character.grid_position,
 		cell.grid_position
-	) > selected_character.movement:
+	) > selected_character.movement_remaining:
 		return
 	
 	# Check if another character occupies the destination
@@ -866,7 +893,7 @@ func _on_move_button_pressed() -> void:
 	if selected_character == null:
 		return
 	
-	if not selected_character.movement_available:
+	if not selected_character.movement_remaining > 0:
 		return
 	
 	current_mode = GameMode.MOVEMENT_MODE

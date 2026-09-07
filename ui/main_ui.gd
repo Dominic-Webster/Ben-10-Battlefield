@@ -121,7 +121,7 @@ func update_opponent_info(base_hp: int, max_hp: int, energy: int) -> void:
 
 
 func update_button_states(character: TestCharacter) -> void:
-	move_button.disabled = not character.movement_available
+	move_button.disabled = character.movement_remaining < 1
 	attack_button.disabled = not character.attack_available
 	ability_button.disabled = not character.ability_available or character.ability == null
 	

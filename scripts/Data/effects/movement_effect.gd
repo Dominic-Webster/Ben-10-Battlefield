@@ -5,4 +5,4 @@ class_name MovementEffect
 
 
 func apply(target : TestCharacter) -> void:
-	target.movement += movement_amount
+	target.movement_remaining += movement_amount

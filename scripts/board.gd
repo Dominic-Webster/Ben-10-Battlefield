@@ -99,7 +99,7 @@ func show_movement_range(character: TestCharacter, occupied_positions: Array[Vec
 	
 	var movement_cells: Array[BoardCell] = get_cells_in_range(
 		character.grid_position,
-		character.movement
+		character.movement_remaining
 	)
 	
 	for cell in movement_cells:
@@ -172,5 +172,13 @@ func clear_highlights() -> void:
 
 
 func move_character(character: TestCharacter, destination: Vector2i) -> void:
+	var movement_cost : int = (
+		abs(destination.x - character.grid_position.x)
+		+ abs(destination.y - character.grid_position.y)
+	)
+	
+	if movement_cost > character.movement_remaining:
+		return
+	
 	character.set_grid_position(destination, self)
-	character.movement_available = false
+	character.movement_remaining -= movement_cost

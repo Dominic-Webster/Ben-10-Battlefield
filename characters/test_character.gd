@@ -16,7 +16,7 @@ signal clicked(character : TestCharacter)
 @export var grid_position : Vector2i
 
 var current_health : int
-var movement_available : bool = true
+var movement_remaining : int
 var attack_available : bool = true
 var ability_available : bool = true
 
@@ -26,6 +26,7 @@ var mesh_instance: MeshInstance3D
 
 func _ready() -> void:
 	current_health = max_health
+	movement_remaining = movement
 	update_health_display()
 	input_event.connect(_on_input_event)
 	
@@ -55,7 +56,7 @@ func _on_input_event(
 
 
 func reset_actions() -> void:
-	movement_available = true
+	movement_remaining = movement
 	attack_available = true
 	ability_available = true
 
@@ -93,7 +94,7 @@ func update_health_display() -> void:
 
 
 func restore_movement() -> void:
-	movement_available = true
+	movement_remaining = movement
 
 
 func restore_attack() -> void:
