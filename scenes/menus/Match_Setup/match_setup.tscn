@@ -1,0 +1,98 @@
+[gd_scene format=3 uid="uid://b8yyy6elhcur2"]
+
+[ext_resource type="Script" uid="uid://bur8k4qdv82q3" path="res://scenes/menus/Match_Setup/match_setup.gd" id="1_l0pj4"]
+
+[node name="MatchSetup" type="Control" unique_id=602313210]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_l0pj4")
+
+[node name="Title" type="Label" parent="." unique_id=894282374]
+layout_mode = 0
+offset_left = 567.0
+offset_top = 57.0
+offset_right = 1249.0
+offset_bottom = 194.0
+theme_override_font_sizes/font_size = 100
+text = "MATCH SETUP"
+
+[node name="MapInfo" type="Control" parent="." unique_id=1219943867]
+anchors_preset = 0
+offset_left = 729.0
+offset_top = 228.0
+offset_right = 769.0
+offset_bottom = 268.0
+
+[node name="MapName" type="Label" parent="MapInfo" unique_id=1856407334]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 23.0
+theme_override_font_sizes/font_size = 40
+text = "Map: 8x8 Test Map"
+
+[node name="MapPreview" type="TextureRect" parent="MapInfo" unique_id=628114135]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="DeckSelection" type="Control" parent="." unique_id=929829603]
+anchors_preset = 0
+offset_left = 800.0
+offset_top = 409.0
+offset_right = 840.0
+offset_bottom = 449.0
+
+[node name="Decks" type="VBoxContainer" parent="DeckSelection" unique_id=393435701]
+layout_mode = 0
+offset_left = -25.0
+offset_top = -8.0
+offset_right = 251.0
+offset_bottom = 292.0
+theme_override_constants/separation = 20
+
+[node name="Label" type="Label" parent="DeckSelection/Decks" unique_id=616317599]
+layout_mode = 2
+theme_override_font_sizes/font_size = 50
+text = "Select Deck"
+
+[node name="DeckSlot1" type="Button" parent="DeckSelection/Decks" unique_id=680945647]
+custom_minimum_size = Vector2(150, 0)
+layout_mode = 2
+theme_override_font_sizes/font_size = 35
+text = "Deck 1"
+
+[node name="DeckSlot2" type="Button" parent="DeckSelection/Decks" unique_id=1762684108]
+custom_minimum_size = Vector2(150, 0)
+layout_mode = 2
+theme_override_font_sizes/font_size = 35
+text = "Deck 2"
+
+[node name="DeckSlot3" type="Button" parent="DeckSelection/Decks" unique_id=273901532]
+custom_minimum_size = Vector2(150, 0)
+layout_mode = 2
+theme_override_font_sizes/font_size = 35
+text = "Deck 3"
+
+[node name="Buttons" type="HBoxContainer" parent="." unique_id=10996830]
+layout_mode = 0
+offset_left = 607.0
+offset_top = 927.0
+offset_right = 1257.0
+offset_bottom = 990.0
+theme_override_constants/separation = 50
+
+[node name="Back" type="Button" parent="Buttons" unique_id=864880554]
+custom_minimum_size = Vector2(300, 0)
+layout_mode = 2
+theme_override_font_sizes/font_size = 40
+text = "Back"
+
+[node name="StartMatch" type="Button" parent="Buttons" unique_id=1932126018]
+custom_minimum_size = Vector2(300, 0)
+layout_mode = 2
+theme_override_font_sizes/font_size = 40
+text = "Start Match"

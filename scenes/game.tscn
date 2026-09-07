@@ -3,13 +3,10 @@
 [ext_resource type="Script" uid="uid://ccoc7r3chirtu" path="res://scripts/game.gd" id="1_lbhrr"]
 [ext_resource type="Script" uid="uid://cb4qgch153aht" path="res://scripts/camera_pivot.gd" id="2_0tnpc"]
 [ext_resource type="Script" uid="uid://utal1a6hie4l" path="res://scripts/camera_rig.gd" id="2_gee14"]
-[ext_resource type="Script" uid="uid://duhlxm28hl3nj" path="res://scripts/board.gd" id="2_iywne"]
 [ext_resource type="Script" uid="uid://c2egw8bmyuycq" path="res://player/Player.gd" id="3_p57ef"]
 [ext_resource type="PackedScene" uid="uid://d0glkf8bmogsd" path="res://ui/main_ui.tscn" id="5_main_ui"]
-[ext_resource type="PackedScene" uid="uid://bu8rshn3umcif" path="res://scenes/entities/base.tscn" id="6_p57ef"]
-
-[sub_resource type="BoxMesh" id="BoxMesh_80nbo"]
-size = Vector3(10, 0.1, 9)
+[ext_resource type="Script" uid="uid://dyp1qwfk4vww" path="res://scripts/controllers/player_controller.gd" id="6_u5sy4"]
+[ext_resource type="Script" uid="uid://m3imgb3rceww" path="res://scripts/controllers/ai_controller.gd" id="7_gee14"]
 
 [node name="Game" type="Node3D" unique_id=1269330327]
 script = ExtResource("1_lbhrr")
@@ -28,12 +25,7 @@ transform = Transform3D(1, 0, 0, 0, 0.7071068, 0.7071068, 0, -0.7071068, 0.70710
 projection = 1
 size = 10.0
 
-[node name="Board" type="Node3D" parent="." unique_id=1115260492]
-script = ExtResource("2_iywne")
-
-[node name="Floor" type="MeshInstance3D" parent="." unique_id=1738458321]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.1, 0)
-mesh = SubResource("BoxMesh_80nbo")
+[node name="MapContainer" type="Node3D" parent="." unique_id=237233307]
 
 [node name="PlayerOne" type="Node" parent="." unique_id=1558863791]
 script = ExtResource("3_p57ef")
@@ -48,9 +40,8 @@ player_type = 1
 
 [node name="MainUI" parent="." unique_id=399228840 instance=ExtResource("5_main_ui")]
 
-[node name="PlayerOneBase" parent="." unique_id=1269204449 instance=ExtResource("6_p57ef")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4, 0, 0)
+[node name="PlayerOneController" type="Node" parent="." unique_id=585104804]
+script = ExtResource("6_u5sy4")
 
-[node name="PlayerTwoBase" parent="." unique_id=130088593 instance=ExtResource("6_p57ef")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 0, 0)
-owner_player = 1
+[node name="PlayerTwoController" type="Node" parent="." unique_id=177672680]
+script = ExtResource("7_gee14")

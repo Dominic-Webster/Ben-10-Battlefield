@@ -9,14 +9,18 @@ enum GameMode {
 	SECOND_WIND_MODE
 }
 
-@onready var board : GameBoard = $Board
+@onready var map_container : Node3D = $MapContainer
 @onready var player_one : Player = $PlayerOne
 @onready var p1_characters : Node = $PlayerOne/Characters
 @onready var player_two : Player = $PlayerTwo
 @onready var p2_characters : Node = $PlayerTwo/Characters
-@onready var player_one_base: Base = $PlayerOneBase
-@onready var player_two_base: Base = $PlayerTwoBase
 @onready var ui: MainUI = $MainUI
+@onready var player_one_controller : PlayerController = $PlayerOneController
+@onready var player_two_controller : PlayerController = $PlayerTwoController
+
+var board : GameBoard
+var player_one_base : Base
+var player_two_base : Base
 
 var current_player : Player
 var selected_character : TestCharacter = null
@@ -93,6 +97,12 @@ func _restore_second_wind_action(action_type : SecondWindEffect.ActionType) -> v
 
 
 func _ready() -> void:
+	_load_map()
+	
+	if board == null or player_one_base == null or player_two_base == null:
+		push_error("Failed to load required map components.")
+		return
+	
 	# Connect board signals
 	board.cell_clicked.connect(_on_cell_clicked)
 	
@@ -110,22 +120,48 @@ func _ready() -> void:
 	player_one_base.clicked.connect(_on_base_clicked)
 	player_two_base.clicked.connect(_on_base_clicked)
 	
-	_setup_match()
+	if MatchManager.player_one_deck == null or MatchManager.player_two_deck == null:
+		push_error("Match started without valid decks.")
+		return
 	
-	# Register base cells
-	board.register_base(player_one_base, [Vector2i(0, 3), Vector2i(0, 4)])
-	board.register_base(player_two_base, [Vector2i(7, 3), Vector2i(7, 4)])
+	_setup_match(MatchManager.player_one_deck, MatchManager.player_two_deck)
+	
+	player_one_controller.setup(player_one, self)
+	player_two_controller.setup(player_two, self)
 	
 	TurnManager.start_turn()
 
 
-func _setup_match() -> void:
-	# Temp Setup
-	player_one.deck = TestDeck.create_deck()
-	player_two.deck = TestDeck.create_deck()
+func _setup_match(p1_deck : DeckData, p2_deck : DeckData) -> void:
+	player_one.deck = p1_deck.cards.duplicate()
+	player_two.deck = p2_deck.cards.duplicate()
+	
+	player_one.deck.shuffle()
+	player_two.deck.shuffle()
 	
 	player_one.draw_cards(5)
 	player_two.draw_cards(5)
+
+
+# ============================================
+# MAP MANAGEMENT
+# ============================================
+
+func _load_map() -> void:
+	if MatchManager.selected_map == null:
+		push_error("Match started without a selected map.")
+		return
+	
+	if MatchManager.selected_map.map_scene == null:
+		push_error("Selected map does not have a map scene.")
+		return
+	
+	var map: Node3D = MatchManager.selected_map.map_scene.instantiate()
+	map_container.add_child(map)
+	
+	board = map.get_node("Board") as GameBoard
+	player_one_base = map.get_node("PlayerOneBase") as Base
+	player_two_base = map.get_node("PlayerTwoBase") as Base
 
 
 # ============================================
@@ -157,6 +193,8 @@ func _on_turn_started(player: PlayerOption.Type) -> void:
 		else:
 			player_two_has_started = true
 		
+		player_two_controller.start_turn()
+		
 		print("Player 2 Turn")
 		print("Energy: ", str(player_two.energy))
 	
@@ -173,6 +211,10 @@ func _on_end_turn_pressed() -> void:
 	_clear_selection()
 	current_mode = GameMode.NORMAL_SELECTION
 	
+	end_current_turn()
+
+
+func end_current_turn() -> void:
 	TurnManager.end_turn()
 
 

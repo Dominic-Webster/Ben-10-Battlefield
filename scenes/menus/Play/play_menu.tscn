@@ -1,0 +1,49 @@
+[gd_scene format=3 uid="uid://b42y67u5h2w8s"]
+
+[ext_resource type="Script" uid="uid://gijikp26s70b" path="res://scenes/menus/Play/play_menu.gd" id="1_ufnxp"]
+
+[node name="PlayMenu" type="Control" unique_id=1343353612]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_ufnxp")
+
+[node name="Label" type="Label" parent="." unique_id=1726019589]
+layout_mode = 0
+offset_left = 778.0
+offset_top = 41.0
+offset_right = 1323.0
+offset_bottom = 178.0
+theme_override_font_sizes/font_size = 100
+text = "PLAY"
+
+[node name="Buttons" type="VBoxContainer" parent="." unique_id=267089996]
+layout_mode = 0
+offset_left = 667.0
+offset_top = 352.0
+offset_right = 1174.0
+offset_bottom = 392.0
+theme_override_constants/separation = 10
+
+[node name="VS_AI" type="Button" parent="Buttons" unique_id=503754008]
+layout_mode = 2
+theme_override_font_sizes/font_size = 50
+text = "VS AI"
+
+[node name="Join" type="Button" parent="Buttons" unique_id=1598260013]
+layout_mode = 2
+theme_override_font_sizes/font_size = 50
+text = "JOIN"
+
+[node name="Host" type="Button" parent="Buttons" unique_id=223882106]
+layout_mode = 2
+theme_override_font_sizes/font_size = 50
+text = "HOST"
+
+[node name="Back" type="Button" parent="Buttons" unique_id=1321420357]
+layout_mode = 2
+theme_override_font_sizes/font_size = 50
+text = "BACK"

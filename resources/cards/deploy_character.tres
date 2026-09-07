@@ -1,11 +1,11 @@
 [gd_resource type="Resource" script_class="CardData" format=3 uid="uid://csbx1uqsmhubi"]
 
-[ext_resource type="Script" uid="uid://cpc4rn261lr22" path="res://scripts/cards/card_effect.gd" id="1_3d83f"]
+[ext_resource type="Script" uid="uid://cpc4rn261lr22" path="res://scripts/Data/card_effect.gd" id="1_3d83f"]
 [ext_resource type="Texture2D" uid="uid://c1j5aeusio7eb" path="res://assets/Card_Art/temp_card.png" id="1_jweyg"]
-[ext_resource type="Script" uid="uid://dfkum4dhnr5kx" path="res://scripts/cards/effects/deploy_character_effect.gd" id="2_3d83f"]
+[ext_resource type="Script" uid="uid://dfkum4dhnr5kx" path="res://scripts/Data/effects/deploy_character_effect.gd" id="2_3d83f"]
 [ext_resource type="Texture2D" uid="uid://c1bh5c3ya8ovc" path="res://assets/Card_Frames/Default_Card_Frame.png" id="2_i5ahu"]
 [ext_resource type="PackedScene" uid="uid://cbjxya8ndn1w5" path="res://characters/test_character.tscn" id="2_xggf4"]
-[ext_resource type="Script" uid="uid://brnsdouduv8m0" path="res://scripts/cards/card_data.gd" id="3_03lgs"]
+[ext_resource type="Script" uid="uid://brnsdouduv8m0" path="res://scripts/Data/card_data.gd" id="3_03lgs"]
 
 [sub_resource type="Resource" id="Resource_xggf4"]
 script = ExtResource("2_3d83f")

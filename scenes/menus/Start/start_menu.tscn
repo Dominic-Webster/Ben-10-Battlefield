@@ -1,0 +1,39 @@
+[gd_scene format=3 uid="uid://bdaocyiv8ujjn"]
+
+[ext_resource type="Script" uid="uid://bxler6vbi3f08" path="res://scenes/menus/Start/start_menu.gd" id="1_it6in"]
+
+[node name="StartMenu" type="Control" unique_id=1724866988]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_it6in")
+
+[node name="Label" type="Label" parent="." unique_id=926862063]
+layout_mode = 0
+offset_left = 463.0
+offset_top = 144.0
+offset_right = 1451.0
+offset_bottom = 281.0
+theme_override_font_sizes/font_size = 100
+text = "BEN 10 BATTLEFIELD"
+
+[node name="Buttons" type="VBoxContainer" parent="." unique_id=1725822303]
+layout_mode = 0
+offset_left = 649.0
+offset_top = 432.0
+offset_right = 1217.0
+offset_bottom = 807.0
+theme_override_constants/separation = 10
+
+[node name="Play" type="Button" parent="Buttons" unique_id=658732094]
+layout_mode = 2
+theme_override_font_sizes/font_size = 50
+text = "PLAY"
+
+[node name="Exit" type="Button" parent="Buttons" unique_id=476221486]
+layout_mode = 2
+theme_override_font_sizes/font_size = 50
+text = "Exit"

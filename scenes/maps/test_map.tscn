@@ -1,0 +1,25 @@
+[gd_scene format=3 uid="uid://d2l6nl8p75j38"]
+
+[ext_resource type="Script" uid="uid://duhlxm28hl3nj" path="res://scripts/board.gd" id="1_2s55i"]
+[ext_resource type="Script" uid="uid://0twqomhtu7e1" path="res://scenes/maps/test_map.gd" id="1_o3n0h"]
+[ext_resource type="PackedScene" uid="uid://bu8rshn3umcif" path="res://scenes/entities/base.tscn" id="2_o3n0h"]
+
+[sub_resource type="BoxMesh" id="BoxMesh_38prr"]
+size = Vector3(10, 0.1, 9)
+
+[node name="TestMap" type="Node3D" unique_id=585698676]
+script = ExtResource("1_o3n0h")
+
+[node name="Board" type="Node3D" parent="." unique_id=1134686933]
+script = ExtResource("1_2s55i")
+
+[node name="Floor" type="MeshInstance3D" parent="." unique_id=1350411507]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.1, 0)
+mesh = SubResource("BoxMesh_38prr")
+
+[node name="PlayerOneBase" parent="." unique_id=1269204449 instance=ExtResource("2_o3n0h")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4, 0, 0)
+
+[node name="PlayerTwoBase" parent="." unique_id=775980138 instance=ExtResource("2_o3n0h")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 0, 0)
+owner_player = 1

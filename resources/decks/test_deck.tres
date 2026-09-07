@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="DeckData" format=3 uid="uid://drp2ci0c4hcoj"]
+
+[ext_resource type="Script" uid="uid://brnsdouduv8m0" path="res://scripts/Data/card_data.gd" id="1_c35fd"]
+[ext_resource type="Script" uid="uid://jbkdg1qa4wly" path="res://scripts/Data/deck_data.gd" id="2_8oap4"]
+[ext_resource type="Resource" uid="uid://8n61q85venm" path="res://resources/cards/dash.tres" id="2_nrlu6"]
+[ext_resource type="Resource" uid="uid://csbx1uqsmhubi" path="res://resources/cards/deploy_character.tres" id="3_wfsrl"]
+[ext_resource type="Resource" uid="uid://nuf2twln56vb" path="res://resources/cards/second_wind.tres" id="4_vrr6u"]
+[ext_resource type="Resource" uid="uid://8syhp5jfy56t" path="res://resources/cards/energy_surge.tres" id="5_gh6hw"]
+
+[resource]
+script = ExtResource("2_8oap4")
+deck_name = "Test Deck"
+cards = Array[ExtResource("1_c35fd")]([ExtResource("2_nrlu6"), ExtResource("2_nrlu6"), ExtResource("2_nrlu6"), ExtResource("2_nrlu6"), ExtResource("2_nrlu6"), ExtResource("3_wfsrl"), ExtResource("3_wfsrl"), ExtResource("3_wfsrl"), ExtResource("3_wfsrl"), ExtResource("3_wfsrl"), ExtResource("4_vrr6u"), ExtResource("4_vrr6u"), ExtResource("4_vrr6u"), ExtResource("4_vrr6u"), ExtResource("4_vrr6u"), ExtResource("5_gh6hw"), ExtResource("5_gh6hw"), ExtResource("5_gh6hw"), ExtResource("5_gh6hw"), ExtResource("5_gh6hw")])
+metadata/_custom_type_script = "uid://jbkdg1qa4wly"
